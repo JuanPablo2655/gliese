@@ -1,15 +1,16 @@
-exports.run = function(client, data, user) {
+exports.run = function(gliese, data, user) {
+console.log("REEEE")//coul;d you restart
+
     let user_id = user.id;
 
-    if(user_id===client.user.id)
+    if(user_id===gliese.user.id)
         return;
 
     let message = data.message;
-    if(message.author.id !== client.user.id)
+    if(message.author.id !== gliese.user.id)
         return;
 
     let emoji = data.emoji.name;
-    //🇨 is C
 
     if(data.count !== 2)
         return;
@@ -21,7 +22,7 @@ exports.run = function(client, data, user) {
     let url = msg.url;
 
     if(emoji==='🇨' || emoji==='🇷')
-        require('../commands/redditComments.js').getData(client, url, 1, message, emoji==='🇷');
+        require('../utils/redditComments.js').getData(gliese, url, 1, message, emoji==='🇷');
 
     if(emoji==='⬅'||emoji==='➡'){
         let id = Number(msg.title.replace("Comment [","").replace("]",""));
@@ -41,20 +42,6 @@ exports.run = function(client, data, user) {
         if(!parentLink)
             return;
 
-        require('../commands/redditComments.js').getData(client, parentLink.value, id, message, parentLink.value.split("/").length >= 10);
+        require('../utils/redditComments.js').getData(gliese, parentLink.value, id, message, parentLink.value.split("/").length >= 10);
     }
-    /*
-
-        m.react('⬅');
-        m.react('🇷');
-        m.react('➡');
-
-     */
-
-    // console.log(emoji);
-    // console.log(user);
-    //
-    // console.log(user.id);
-    // console.log(client.user.id);
-
 };

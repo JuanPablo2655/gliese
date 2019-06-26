@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const levelsSchema = mongoose.Schema({
-    Username: String,
-    UserID: String,
+    username: String,
+    userID: String,
     servername: String,
     serverID: String,
     xp: Number,
