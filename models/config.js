@@ -4,7 +4,7 @@ const configSchema = mongoose.Schema({
     serverID: String,
     prefix: String,
     adminRole: String,
-    comments: Number,
+    disabled: Array,
 });
 
-module.exports = mongoose.model("config", levelsSchema);
+module.exports = mongoose.model("config", configSchema);

@@ -2,15 +2,15 @@
 exports.get = function(cmd_name){
     return new Promise(resolve => {
         // let d = null;
-        console.log(cmd_name);
+        // console.log(cmd_name);
         let command = require('../models/command.js');
         let query = {command_name: cmd_name};
         // let query = {userID: "217154752734035969", serverID: "591641305747161119"}//they should be numbers right? I have them set as strings.  oh
-        console.log("Querying database with command: "+JSON.stringify(query));
+        // console.log("Querying database with command: "+JSON.stringify(query));
         command.findOne(query, function (err, res) {
             if (err) console.log(err);
-            console.log("Database queried, data returned:");
-            console.log(res);
+            // console.log("Database queried, data returned:");
+            // console.log(res);
             resolve(res);
         });
         // resolve(d);
@@ -29,7 +29,7 @@ exports.get = function(cmd_name){
 //yeah
 
 // create [command_name] [file_name] [restricted] <-- sets enabled to false by default, and leaves other fields blank, to be added with edit cmd?
-// edit [field_name] [value]
+// edit [command_name] [field_name] [value]
 // delete [command_name]
 // enable [command_name]
 // disable [command_name]

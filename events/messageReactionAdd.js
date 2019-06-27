@@ -1,5 +1,5 @@
 exports.run = function(gliese, data, user) {
-console.log("REEEE")//coul;d you restart
+//console.log("REEEE")//coul;d you restart
 
     let user_id = user.id;
 

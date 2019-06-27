@@ -9,32 +9,63 @@ const secrets = require("./secrets.json");
 mongoose.connect('mongodb://localhost:27017/gliese', {
     useNewUrlParser: true
 });
+
 mongoose.connection.on('connected', () => {
-    console.log('[Mongoose]\tMongoose connection successfully opened');
+    debug('[Mongoose]\tMongoose connection successfully opened');
 });
 
 
 gliese.on('ready', () => {
-    console.log('[Gliese]\tOnline!');
+    debug('[Gliese]\tOnline!');
 });
+
+gliese.on('guildCreate', (guild) => {
+    let conf = require("./models/config.js");
+    const newConfig = new conf({
+        serverID: guild.id,
+        prefix: "g!",
+        adminRole: "admin",
+        disabled: []
+    });
+    newConfig.save().catch(err => debug(err));
+})
+
+//Disable console.log
+debug = console.log;//this stores it for printing when the bot turns on/off
+// console.log = function(a){};
 
 //This is to load the reaction handler, you can change it if you want
 gliese.on('messageReactionAdd', (data, usr) => {
     require('./events/messageReactionAdd.js').run(gliese, data, usr);
 });
 
+let cooldowns = {};
+
 gliese.on('message', async (message, gliese) => {
     if (message.author.bot) return;
     //uits different
-    const args = message.content /*.slice(config.prefix.length) <-- it could be diff for custom set ones*/ .trim().split(/ +/g);
+    const msgDAT = message.content+"";
+    const customConf = await require("./conf/customConfig.js").get(message.guild.id);
+    let prefix = (customConf?customConf.prefix:config.prefix);
+
+    if(!msgDAT.startsWith(prefix)){
+        return;
+    }
+
+    const args =  msgDAT.slice(prefix.length).trim().split(/ +/g);
+
+
     const command = args[0].toLowerCase();
     delete args[0];
 
     //Gets stuff about commands
     let data = await require('./utils/queryCommands.js').get(command);
+    if (data) {
+        console.log(`Gliese: ${message.author.username} used comamnd '${data.command_name}'`)
+    }
 
-    console.log("Data for this command: ");
-    console.log(data);
+    // console.log("Data for this command: ");
+    // console.log(data);
 
     //no command returned
     if (!data)
@@ -42,72 +73,59 @@ gliese.on('message', async (message, gliese) => {
     //got it
     //^^ Returns from method here
 
-    if (data.enabled == false) { //why == false? I don't know wait I think that was rifht xD oof  Icabnt restart the bot
-        if (!(message.sender.id in config.admins)) {
-            return message.channel.send("This command is disabled by the developers.  Sorry!");
-        } else { //I need the bot token kk 
-            console.log("blocked command bypassed 1");
-        }
-    }
-
     if (data.restricted) {
-        if (!(message.sender.id in config.admins)) {
-            return; //these wont be in the help menu, no point in letting them know its real.
+        if (!(config.admins.includes(message.author.id+""))) {// oh I forgot to change this, oh  it was the other that was a problem
+            return console.log("Restricted command denied"); //these wont be in the help menu, no point in letting them know its real.
         } else {
             console.log("blocked command bypassed 2");
         }
     }
 
+    if (data.enabled == false) { //why == false? I don't know wait I think that was rifht xD oof  Icabnt restart the bot
+        // console.log(message.author.id); console.log(JSON.stringify(config.admins));    
+        if (!(config.admins.includes(message.author.id+""))) {
+            return message.channel.send("This command is disabled by the developers.  Sorry!");
+        } else { //I need the bot token kk 
+            console.log("blocked command bypassed 1");
+        }
+    }
+    //{'reddit':{'name':timestamp}}
+    if(!cooldowns[command])
+        cooldowns[command] = {};
+
+    if(cooldowns[command][message.author.id])
+        return message.channel.send("Commands have a 2 second cooldown");
+
+    cooldowns[command][message.author.id] = new Date().getTime()+2000;
+
+
     require('./commands/' + data.execution + ".js").run(gliese, message, data);
     //IK why this isnt working
     //levels thing
-
-
 });
 
-function manageLevels(message) {
-    let levels = require('./models/levels.js'); // spelling error REEEEEEEEEEEEEEEEEEEEEEEEEEEE
-    let xpToAdd = Math.round(Math.random() * ((25 - 15) + 1) + 15);
-    levels.findOne({
-        userID: message.author.id,
-        serverID: message.guild.id
-    }, (err, res) => {
-        if (err) console.log(err);
-        if (!res) {
-            const newLevel = new levels({
-                username: message.author.username,
-                userID: message.author.id,
-                servername: message.guild.name,
-                serverID: message.guild.id,
-                xp: xpToAdd,
-                lvl: 0
-            });
-            newLevel.save().catch(err => console.log(err));
-        } else {
-            //for level=0 -- (5*0)+(50*0)+100 == 100xp to get to level 1
-            const nextLevel = 5 * Math.pow(res.lvl, 2) + 50 * res.lvl + 100;
-            //if they get 10 xp, and should level up, then they get 20 xp the next msg, itll be on the second message that it levels them up, and wont add the 20 xp
-            //oof
-
-            console.log(res.xp);console.log(nextLevel);
-
-            if (res.xp > nextLevel) {
-                res.lvl = res.lvl + 1;
-                res.xp = 0;
-
-                //these 2 values could change
-                res.servername = message.guild.name;
-                res.username = message.author.username;
-
-                message.channel.send("Congratulations <@"+res.userID+"> you are now level " + res.lvl + "!");
-                res.save().catch(err => console.log(err));
-            } else {
-                //xp += xpToAdd
-                res.xp = res.xp + xpToAdd;
-                res.save().catch(err => console.log(err));
+setInterval(function(){
+    let now = new Date().getTime();
+    for(let cmd in cooldowns){
+        for(let user in cooldowns[cmd]){
+            if(now > cooldowns[cmd][user]){
+                delete cooldowns[cmd][user];
             }
         }
-    });
+    }
+}, 500);
+
+function manageLevels(message) {
+    if(!cooldowns['__xp'])
+        cooldowns['__xp'] = {};
+
+    if(cooldowns['__xp'][message.author.id])
+        return;
+
+    cooldowns['__xp'][message.author.id] = new Date().getTime()+60000;
+
+    let xpToAdd = Math.round(Math.random() * ((25 - 15) + 1) + 15);
+    require('./utils/xp.js').add(xpToAdd, message);
 }
 
 //I can only see one line in the console
