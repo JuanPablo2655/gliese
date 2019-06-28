@@ -26,6 +26,14 @@ $ cd gliese
 $ node gliese.js
 ```
 
+### Setting Up
+create a `secrets.json` file and add the following
+```json
+{
+    "token": "bot token here"
+}
+```
+
  ### Commands
   - **help** -- displays help
   - **rps [choice]** -- play rock paper scissors
