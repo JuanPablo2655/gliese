@@ -2,6 +2,7 @@
 
 Gliese is an entertainment bot for Discord made during their first annual hack week in 2019.
 
+
  # Commands
   - help -- displays help
   - rps [choice] -- play rock paper scissors
@@ -12,5 +13,8 @@ Gliese is an entertainment bot for Discord made during their first annual hack w
   
  # Created by
  LavaTheif#1680 (https://github.com/LavaTheif)
+ 
  Juan Pablo#2655 (https://github.com/JuanPablo2655)
+ 
  Axalis Industries™#2169 (Bot Art)
+ 
