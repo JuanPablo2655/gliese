@@ -1,7 +1,7 @@
-exports.run = async function(bot, message, commandData){
+exports.run = async function(bot, message, data){
     let xp = require('../utils/xp.js');
-    let data = await xp.get(message.author.id, message.guild.id);
+    let level = await xp.get(message.author.id, message.guild.id);
     
-    message.reply(" your level is: "+data.lvl+"\nYou have "+data.xp+"/"+xp.nextLevel(data.lvl)+" xp.");
+    message.reply(" your level is: "+level.lvl+"\nYou have "+level.xp+"/"+xp.nextLevel(level.lvl)+" xp.");
 
 }

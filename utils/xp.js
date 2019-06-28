@@ -4,7 +4,7 @@ exports.add = function (xpToAdd, message) {
         userID: message.author.id,
         serverID: message.guild.id
     }, (err, res) => {
-        if (err) debug(err);
+        if (err) console.log(err);
         if (!res) {
             const newLevel = new levels({
                 username: message.author.username,
@@ -14,7 +14,7 @@ exports.add = function (xpToAdd, message) {
                 xp: xpToAdd,
                 lvl: 0
             });
-            newLevel.save().catch(err => debug(err));
+            newLevel.save().catch(err => console.log(err));
         } else {
             //for level=0 -- (5*0)+(50*0)+100 == 100xp to get to level 1
             const nextLevel = exports.nextLevel(res.lvl);//5 * Math.pow(res.lvl, 2) + 50 * res.lvl + 100;
@@ -35,7 +35,7 @@ exports.add = function (xpToAdd, message) {
             }
             res.lvl = futureLevel;
             res.xp = futureXP;
-            res.save().catch(err => debug(err));
+            res.save().catch(err => console.log(err));
 
             // if (res.xp > nextLevel) {
             //     res.lvl = res.lvl + 1;
@@ -46,7 +46,7 @@ exports.add = function (xpToAdd, message) {
             // } else {
             //     //xp += xpToAdd
             //     res.xp = res.xp + xpToAdd;
-            //     res.save().catch(err => debug(err));
+            //     res.save().catch(err => console.log(err));
             // }
         }
     });

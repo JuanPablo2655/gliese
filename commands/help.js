@@ -13,7 +13,7 @@ exports.run = function(bot, message, data){
             let usage = c.usage;
             let desc = c.description;
             // msg += "```\n"+name+"\nUsage: "+usage+"\n"+desc+"```";
-            helpEmbed.addField(name, usage)
+            helpEmbed.addField(name, usage || "no usage set")
         }
         msg+="Mention the bot to find out this servers prefix."
         helpEmbed.setFooter(msg)

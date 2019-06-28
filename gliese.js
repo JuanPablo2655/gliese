@@ -10,12 +10,12 @@ mongoose.connect('mongodb://localhost:27017/gliese', {
 });
 
 mongoose.connection.on('connected', () => {
-    debug('[Mongoose]\tMongoose connection successfully opened');
+    console.log('[Mongoose]\tMongoose connection successfully opened');
 });
 
 
 gliese.on('ready', () => {
-    debug('[Gliese]\tOnline!');
+    console.log('[Gliese]\tOnline!');
 });
 
 gliese.on('guildCreate', (guild) => {
@@ -23,14 +23,14 @@ gliese.on('guildCreate', (guild) => {
     //sets up a config
     const newConfig = new conf({
         serverID: guild.id,
-        prefix: "g!",//should this just be read from the default config?
+        prefix: config.prefix,
         adminRole: "admin",
         disabled: []
     });
-    newConfig.save().catch(err => debug(err));
+    newConfig.save().catch(err => console.log(err));
 })
 
-debug = console.log;
+console.log = console.log;
 
 gliese.on('messageReactionAdd', (data, usr) => {
     require('./events/messageReactionAdd.js').run(gliese, data, usr);
@@ -38,28 +38,41 @@ gliese.on('messageReactionAdd', (data, usr) => {
 
 let cooldowns = {};
 
-gliese.on('message', async (message, gliese) => {
+gliese.on('message', async (message) => {
     if (message.author.bot) return;//ignore bots
 
+    // if(message.mentions.members){//this line checks its defined
+    //     if(message.mentions.member.id === gliese.user.id){//ahh
+    //         return message.channel.send("REEEEEE");
+    //     }
+    //     return message.channel.send(message.mentions.members);
+    // }
+    
+    
     const msgDAT = message.content+"";//message user sent
     //load the servers config, and check if they have a prefix set.  if not, use global default
     const customConf = await require("./conf/customConfig.js").get(message.guild.id);
     let prefix = (customConf?customConf.prefix:config.prefix);
+
+    //assign variables
+    const args =  msgDAT.slice(prefix.length).split(/ +/g);
+    const command = args[0].toLowerCase();
+    delete args[0];
+
+    if ((message.content+"").replace("!","").trim()==="<@"+gliese.user.id+">") {
+        message.reply("This servers prefix is: "+prefix);
+    }
+
 
     if(!msgDAT.startsWith(prefix)){
         //normal message, not a command
         return manageLevels(message);
     }
 
-    //assign variables
-    const args =  msgDAT.slice(prefix.length).trim().split(/ +/g);
-    const command = args[0].toLowerCase();
-    delete args[0];
-
     //Gets data stored about commands
     let data = await require('./utils/queryCommands.js').get(command);
     if (data) {
-        console.log(`Gliese: ${message.author.username} used comamnd '${data.command_name}'`)
+        console.log(`[Gliese]\t${message.author.username} used comamnd '${data.command_name}'`)
     }
 
     //no command returned, assume it was just a message
