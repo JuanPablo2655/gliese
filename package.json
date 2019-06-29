@@ -1,0 +1,28 @@
+{
+  "name": "gliese",
+  "version": "1.0.0",
+  "description": "Discord hack week",
+  "main": "gliese.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JuanPablo2655/gliese.git"
+  },
+  "keywords": [
+    "discord",
+    "node"
+  ],
+  "author": "Juan, LavaTheif, Atrilan",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JuanPablo2655/gliese/issues"
+  },
+  "homepage": "https://github.com/JuanPablo2655/gliese#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1",
+    "mongoose": "^5.6.1",
+    "node-fetch": "^2.6.0"
+  }
+}
