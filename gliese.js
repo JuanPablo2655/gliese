@@ -15,17 +15,6 @@ mongoose.connection.on('connected', () => {
 
 
 gliese.on('ready', () => {
-    Let command = require("./models/command.js");
-    const newCommand = new command({
-        command_name: "create",
-        description: "creates commands",
-        usage: "create [name] [file] [restricted]",
-        enabled: false,
-        category: dev,
-        execution: create,
-        restricted: true
-        });
-    newCommand.save().catch(err => console.log(err));
     console.log('[Gliese]\tOnline!');
 });
 
