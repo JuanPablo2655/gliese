@@ -22,8 +22,7 @@ exports.run = async function(gliese, message, data){
             const newConfig = new conf({
                 serverID: guild.id,
                 prefix: config.prefix,
-                adminRole: role,
-                disabled: []
+                adminRole: role
             });
             newConfig.save().catch(err => console.log(err));
             message.channel.send("the server didn't have a config so I added it.")
