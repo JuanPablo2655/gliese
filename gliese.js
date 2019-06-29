@@ -15,6 +15,10 @@ mongoose.connection.on('connected', () => {
 
 
 gliese.on('ready', () => {
+    Let command = require("./models/command.js");
+    const newCommand = new command({
+        });
+    newCommand.save().catch(err => console.log(err));
     console.log('[Gliese]\tOnline!');
 });
 
